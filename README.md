@@ -49,7 +49,7 @@ You will need to have the following installed on your local machine:
 
 5. Start the server
 
-   `npm start server`
+   `npm run server`
 
 6. Login to authorize Spotify API by going to
 
