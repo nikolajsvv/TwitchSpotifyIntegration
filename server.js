@@ -1,10 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
-const path = require("path");
 const querystring = require("querystring");
 const fs = require("fs");
 const app = express();
+const open = require("open");
+
 const PORT = process.env.PORT || 8888;
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
@@ -65,7 +66,54 @@ app.get("/callback", (req, res) => {
             },
           })
           .then((response) => {
-            res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+            // Store the data for callback use
+            const displayName = response.data.display_name;
+            const email = response.data.email;
+            const imageUrl = response.data.images[0].url;
+            res.send(`
+            <html>
+              <head>
+                <style>
+                  .body {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    height: 100%;
+                  }
+                  .portrait {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 200px;
+                    width: 200px;
+                    border-radius: 100px;
+                    overflow: hidden;
+                  }
+                  .info {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                  }
+                </style>
+              </head>
+              <body class="body">
+                <div>
+                  <div class="portrait">
+                    <img src="${imageUrl}" alt="User's profile image" />
+                  </div>
+                  <div class="info">
+                    <h2>${displayName}</h2>
+                    <p>${email}</p>
+                  </div>
+                </div>
+                <div>
+                  <p>You have successfully logged into Spotify.</p>
+                </div>
+              </body>
+            </html>
+            `);
             accessToken = access_token;
           })
           .catch((error) => {
@@ -126,4 +174,6 @@ app.get("/nowplaying", (req, res) => {
 
 app.listen(PORT, (req, res) => {
   console.log(`Spotfiy API listening on http://localhost:${PORT}`);
+  // Open the browser to the login URL after the server has started
+  open("http://localhost:8888/login");
 });

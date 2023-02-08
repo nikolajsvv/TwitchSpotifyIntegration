@@ -3,7 +3,6 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const cheerio = require("cheerio");
-const request = require("request");
 
 const storeCurrentlyPlaying = () => {
   http.get("http://localhost:8888/nowplaying", (res) => {
