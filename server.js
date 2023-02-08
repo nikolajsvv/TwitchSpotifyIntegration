@@ -125,5 +125,5 @@ app.get("/nowplaying", (req, res) => {
 });
 
 app.listen(PORT, (req, res) => {
-  console.log(`Spotfiy API listening at http://localhost:${PORT}`);
+  console.log(`Spotfiy API listening on http://localhost:${PORT}`);
 });
