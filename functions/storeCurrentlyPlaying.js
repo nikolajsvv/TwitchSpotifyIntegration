@@ -1,7 +1,9 @@
 const http = require("http");
+const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const cheerio = require("cheerio");
+const request = require("request");
 
 const storeCurrentlyPlaying = () => {
   http.get("http://localhost:8888/nowplaying", (res) => {
@@ -17,8 +19,23 @@ const storeCurrentlyPlaying = () => {
         const songName = bodyObject.item.name;
         const artist = bodyObject.item.artists[0].name;
         const songInfo = `${songName} by ${artist}`;
-
+        const albumImgUrl = bodyObject.item.album.images[0].url;
         fs.writeFileSync(path.join(__dirname, "../data/song.txt"), songInfo);
+
+        // Store the album cover image locally
+        https.get(albumImgUrl, (imgRes) => {
+          let imgData = [];
+          imgRes.on("data", (chunk) => {
+            imgData.push(chunk);
+          });
+          imgRes.on("end", () => {
+            const finalImgData = Buffer.concat(imgData);
+            fs.writeFileSync(
+              path.join(__dirname, "../data/album.jpg"),
+              finalImgData
+            );
+          });
+        });
       }
     });
   });
