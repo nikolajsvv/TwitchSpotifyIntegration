@@ -94,4 +94,4 @@ If you would like to contribute to the project, please create a pull request wit
 
 ## License
 
-This project is licensed under the [Your License Name] license - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the Apache License - see the [LICENSE.md](LICENSE.md) file for details.
