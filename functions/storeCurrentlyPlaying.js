@@ -19,7 +19,7 @@ const storeCurrentlyPlaying = () => {
         const artist = bodyObject.item.artists[0].name;
         const songInfo = `${songName} by ${artist}`;
         const albumImgUrl = bodyObject.item.album.images[0].url;
-        const songNameSpacing = `${songName}   `;
+        const songNameSpacing = `${songName}${" ".repeat(4)}`;
         fs.writeFileSync(
           path.join(__dirname, "../data/currentSong.txt"),
           songNameSpacing
