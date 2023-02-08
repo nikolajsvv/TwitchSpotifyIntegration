@@ -19,7 +19,18 @@ const storeCurrentlyPlaying = () => {
         const artist = bodyObject.item.artists[0].name;
         const songInfo = `${songName} by ${artist}`;
         const albumImgUrl = bodyObject.item.album.images[0].url;
-        fs.writeFileSync(path.join(__dirname, "../data/song.txt"), songInfo);
+        fs.writeFileSync(
+          path.join(__dirname, "../data/currentSong.txt"),
+          songName
+        );
+        fs.writeFileSync(
+          path.join(__dirname, "../data/currentArtist.txt"),
+          artist
+        );
+        fs.writeFileSync(
+          path.join(__dirname, "../data/currentlyPlaying.txt"),
+          songInfo
+        );
 
         // Store the album cover image locally
         https.get(albumImgUrl, (imgRes) => {
