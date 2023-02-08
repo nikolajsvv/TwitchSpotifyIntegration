@@ -1,5 +1,4 @@
 .DS_STORE
 node_modules
 .env
-/data/song.txt
 /data/access_token.txt

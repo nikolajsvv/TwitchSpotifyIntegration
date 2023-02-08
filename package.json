@@ -8,6 +8,9 @@
     "server": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "app": "./index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nikolajsvv/spotify_chat_bot.git"
