@@ -28,9 +28,10 @@ client.connect().catch((error) => {
   console.error(error);
 });
 
-// Listen for messages in chat
+// Listens for messages in Twitch chat and responds based on commands
 client.on("message", (channel, tags, message, self) => {
   if (self) return;
+  // Switch case to check for commands
   switch (message.toLowerCase()) {
     case "!commands":
       client.say(
@@ -44,6 +45,7 @@ client.on("message", (channel, tags, message, self) => {
         client.say(channel, `@${tags.username}, hey there! How are doing?`)
       );
       break;
+    // S
     case "!song":
       http.get("http://localhost:8888/nowplaying", (res) => {
         let data = "";
