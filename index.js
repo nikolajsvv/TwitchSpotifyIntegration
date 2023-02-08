@@ -40,11 +40,6 @@ client.on("message", (channel, tags, message, self) => {
         !song`
       );
       break;
-    case "hi":
-      client.say(
-        client.say(channel, `@${tags.username}, hey there! How are doing?`)
-      );
-      break;
     // Responds with currently playing song from /nowplaying endpoint
     case "!song":
       http.get("http://localhost:8888/nowplaying", (res) => {
