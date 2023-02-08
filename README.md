@@ -67,7 +67,6 @@ You will need to have the following installed on your local machine:
 4. Click `Edit settings`.
 5. Add the link `http://localhost:8888/callback` to the Redirect URI and click Save.
 6. Copy/Paste the Client ID and Client Secret to your .env file.
-7. Update your SPOTIFY_REDIRECT_URI to `http://localhost:8888/callback` in .env file.
 
 ## Setting up Twitch API
 
