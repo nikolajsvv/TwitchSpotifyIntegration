@@ -131,6 +131,7 @@ app.get("/callback", (req, res) => {
 // Endpoint to generate a refresh token instead of having to re-login
 app.get("/refresh_token", (req, res) => {
   const { refresh_token } = req.query;
+  const code = req.query.code || null;
 
   axios({
     method: "POST",
