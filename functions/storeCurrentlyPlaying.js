@@ -13,40 +13,44 @@ const storeCurrentlyPlaying = () => {
     res.on("end", () => {
       const $ = cheerio.load(data);
       const body = $("pre").text();
-      const bodyObject = JSON.parse(body);
-      if (bodyObject) {
-        const songName = bodyObject.item.name;
-        const artist = bodyObject.item.artists[0].name;
-        const songInfo = `${songName} by ${artist}`;
-        const albumImgUrl = bodyObject.item.album.images[0].url;
-        const songNameSpacing = `${songName}${" ".repeat(4)}`;
-        fs.writeFileSync(
-          path.join(__dirname, "../data/currentSong.txt"),
-          songNameSpacing
-        );
-        fs.writeFileSync(
-          path.join(__dirname, "../data/currentArtist.txt"),
-          artist
-        );
-        fs.writeFileSync(
-          path.join(__dirname, "../data/currentlyPlaying.txt"),
-          songInfo
-        );
+      try {
+        const bodyObject = JSON.parse(body);
+        if (bodyObject) {
+          const songName = bodyObject.item.name;
+          const artist = bodyObject.item.artists[0].name;
+          const songInfo = `${songName} by ${artist}`;
+          const albumImgUrl = bodyObject.item.album.images[0].url;
+          const songNameSpacing = `${songName}${" ".repeat(4)}`;
+          fs.writeFileSync(
+            path.join(__dirname, "../data/currentSong.txt"),
+            songNameSpacing
+          );
+          fs.writeFileSync(
+            path.join(__dirname, "../data/currentArtist.txt"),
+            artist
+          );
+          fs.writeFileSync(
+            path.join(__dirname, "../data/currentlyPlaying.txt"),
+            songInfo
+          );
 
-        // Store the album cover image locally
-        https.get(albumImgUrl, (imgRes) => {
-          let imgData = [];
-          imgRes.on("data", (chunk) => {
-            imgData.push(chunk);
+          // Store the album cover image locally
+          https.get(albumImgUrl, (imgRes) => {
+            let imgData = [];
+            imgRes.on("data", (chunk) => {
+              imgData.push(chunk);
+            });
+            imgRes.on("end", () => {
+              const finalImgData = Buffer.concat(imgData);
+              fs.writeFileSync(
+                path.join(__dirname, "../data/album.jpg"),
+                finalImgData
+              );
+            });
           });
-          imgRes.on("end", () => {
-            const finalImgData = Buffer.concat(imgData);
-            fs.writeFileSync(
-              path.join(__dirname, "../data/album.jpg"),
-              finalImgData
-            );
-          });
-        });
+        }
+      } catch (err) {
+        console.error(err);
       }
     });
   });
