@@ -3,8 +3,14 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const cheerio = require("cheerio");
+const refreshTokenIfNeeded = require("./refreshTokenIfNeeded");
 
 const storeCurrentlyPlaying = () => {
+  refreshTokenIfNeeded();
+
+  // Read the access token from the file as a string
+  accessToken = fs.readFileSync("../data/access_token.txt", "utf8");
+
   http.get("http://localhost:8888/nowplaying", (res) => {
     let data = "";
     res.on("data", (chunk) => {
