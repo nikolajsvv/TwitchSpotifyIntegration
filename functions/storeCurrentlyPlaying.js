@@ -9,7 +9,15 @@ const storeCurrentlyPlaying = () => {
   refreshTokenIfNeeded();
 
   // Read the access token from the file as a string
-  accessToken = fs.readFileSync("../data/access_token.txt", "utf8");
+  const accessTokenFilePath = path.join(__dirname, "../data/access_token.txt");
+
+  // Create the file with a default value if it does not exist
+  if (!fs.existsSync(accessTokenFilePath)) {
+    fs.writeFileSync(accessTokenFilePath, "");
+  }
+
+  // Read the access token from the file as a string
+  accessToken = fs.readFileSync(accessTokenFilePath, "utf8");
 
   http.get("http://localhost:8888/nowplaying", (res) => {
     let data = "";

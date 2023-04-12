@@ -1,13 +1,23 @@
 const fs = require("fs");
+const path = require("path");
 
 const refreshTokenIfNeeded = () => {
-  const expirationTime = parseInt(
-    fs.readFileSync("../data/token_expiration.txt", "utf8")
+  const expirationFilePath = path.join(
+    __dirname,
+    "../data/token_expiration.txt"
   );
+
+  // Create the file with a default value if it does not exist
+  if (!fs.existsSync(expirationFilePath)) {
+    fs.writeFileSync(expirationFilePath, "0");
+  }
+
+  const expirationTime = parseInt(fs.readFileSync(expirationFilePath, "utf8"));
+
   if (Date.now() > expirationTime) {
     // Read the refresh token from the file as a string
     const refreshToken = fs.readFileSync("../data/refresh_token.txt", "utf8");
-    
+
     axios({
       method: "POST",
       url: "https://accounts.spotify.com/api/token",
