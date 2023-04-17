@@ -57,7 +57,9 @@ app.get("/callback", (req, res) => {
   })
     .then((response) => {
       if (response.status === 200) {
-        const { access_token, token_type, expires_in } = response.data;
+        const { access_token, token_type, expires_in, refresh_token } =
+          response.data;
+
         // Store the expiration time (minus a small buffer to account for delays)
         const expirationTime = Date.now() + (expires_in - 60) * 1000;
         fs.writeFileSync(
@@ -65,6 +67,7 @@ app.get("/callback", (req, res) => {
           expirationTime.toString()
         );
 
+        fs.writeFileSync("./data/refresh_token.txt", refresh_token);
         axios
           .get("https://api.spotify.com/v1/me", {
             headers: {

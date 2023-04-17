@@ -18,6 +18,7 @@ const storeCurrentlyPlaying = () => {
 
   // Read the access token from the file as a string
   accessToken = fs.readFileSync(accessTokenFilePath, "utf8");
+  console.log(accessToken);
 
   http.get("http://localhost:8888/nowplaying", (res) => {
     let data = "";
