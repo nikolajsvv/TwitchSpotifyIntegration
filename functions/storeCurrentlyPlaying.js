@@ -18,7 +18,6 @@ const storeCurrentlyPlaying = () => {
 
   // Read the access token from the file as a string
   accessToken = fs.readFileSync(accessTokenFilePath, "utf8");
-  console.log(accessToken);
 
   http.get("http://localhost:8888/nowplaying", (res) => {
     let data = "";
@@ -31,8 +30,15 @@ const storeCurrentlyPlaying = () => {
       try {
         const bodyObject = JSON.parse(body);
         if (bodyObject) {
-          const songName = bodyObject.item.name;
-          const artist = bodyObject.item.artists[0].name;
+          const songName =
+            bodyObject.item && bodyObject.item.name
+              ? bodyObject.item.name
+              : "No Song Playing";
+          const artist =
+            bodyObject.item && bodyObject.item.artists.length > 0
+              ? bodyObject.item.artists[0].name
+              : "Unknown Artist";
+
           const songInfo = `${songName} by ${artist}`;
           const albumImgUrl = bodyObject.item.album.images[0].url;
           const songNameSpacing = `${songName}${" ".repeat(4)}`;

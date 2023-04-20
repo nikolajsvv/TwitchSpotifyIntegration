@@ -68,6 +68,7 @@ app.get("/callback", (req, res) => {
         );
 
         fs.writeFileSync("./data/refresh_token.txt", refresh_token);
+
         axios
           .get("https://api.spotify.com/v1/me", {
             headers: {
@@ -141,13 +142,15 @@ app.get("/callback", (req, res) => {
 app.get("/refresh_token", (req, res) => {
   const { refresh_token } = req.query;
   const code = req.query.code || null;
+  console.log(code);
 
   axios({
     method: "POST",
     url: "https://accounts.spotify.com/api/token",
     data: querystring.stringify({
-      grant_type: "authorization_code",
+      grant_type: "refresh_token",
       code: code,
+      refresh_token: refresh_token,
       redirect_uri: REDIRECT_URI,
     }),
     headers: {
@@ -159,6 +162,7 @@ app.get("/refresh_token", (req, res) => {
   })
     .then((response) => {
       res.send(response.data);
+      console.log(response.data);
       accessToken = refresh_token;
       fs.writeFileSync("../data/refresh_token.txt", refresh_token);
     })
