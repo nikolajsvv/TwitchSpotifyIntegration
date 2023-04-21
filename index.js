@@ -54,7 +54,7 @@ client.on("message", (channel, tags, message, self) => {
           const songLink = bodyObject.item.external_urls.spotify;
           const songName = bodyObject.item.name;
           const artist = bodyObject.item.artists[0].name;
-          
+
           client.say(
             channel,
             `@${tags.username}, you are listening to ${songName} by ${artist}. Spotify Link: ${songLink}`

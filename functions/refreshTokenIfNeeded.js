@@ -1,58 +1,33 @@
-require("dotenv").config();
+const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
-const axios = require("axios");
-const querystring = require("querystring");
-
-const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI;
 
 const refreshTokenIfNeeded = async () => {
-  const expirationFilePath = path.join(
+  const tokenExpirationPath = path.join(
     __dirname,
     "../data/token_expiration.txt"
   );
-
-  const refreshTokenFilePath = path.join(
-    __dirname,
-    "../data/refresh_token.txt"
-  );
-
-  // Create the file with a default value if it does not exist
-  if (!fs.existsSync(expirationFilePath)) {
-    fs.writeFileSync(expirationFilePath, "0");
-  }
-
-  const expirationTime = parseInt(fs.readFileSync(expirationFilePath, "utf8"));
-
-  if (Date.now() >= expirationTime) {
-    // Read the refresh token from the file as a string
-    const refreshToken = fs.readFileSync(refreshTokenFilePath).toString();
+  const refreshTokenPath = path.join(__dirname, "../data/refresh_token.txt");
+  const accessTokenPath = path.join(__dirname, "../data/access_token.txt");
+  const expirationTime = fs.readFileSync(tokenExpirationPath);
+  const refreshToken = fs.readFileSync(refreshTokenPath);
+  if (Date.now().toString() >= expirationTime) {
     try {
-      const respone = await axios({
-        method: "POST",
-        url: "https://accounts.spotify.com/api/token",
-        data: querystring.stringify({
-          grant_type: "refresh_token",
-          refresh_token: refreshToken,
-        }),
-        headers: {
-          "content-type": "application/x-www-form-urlencoded",
-          Authorization: `Basic ${new Buffer.from(
-            `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
-          ).toString("base64")}`,
-        },
-      });
-      const { access_token, token_type, expires_in } = response.data;
-      const expirationTime = Date.now() + (expires_in - 60) * 1000;
-      fs.writeFileSync(
-        "../data/token_expiration.txt",
-        expirationTime.toString()
+      const response = await axios.get(
+        `http://localhost:8888/refresh_token?refresh_token=${refreshToken.toString()}`
       );
-      accessToken = access_token;
-    } catch (err) {
-      console.error(err);
+
+      const newAccessToken = response.data.access_token;
+      const expiresIn = response.data.expires_in;
+
+      fs.writeFileSync(accessTokenPath, newAccessToken.toString());
+      fs.writeFileSync(
+        tokenExpirationPath,
+        (Date.now() + expiresIn * 1000).toString()
+      );
+      console.log(`Successfully updated access_token and expires_in`);
+    } catch (error) {
+      console.error("Failed to refresh access token", error);
     }
   }
 };

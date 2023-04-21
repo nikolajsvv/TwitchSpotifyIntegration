@@ -5,19 +5,14 @@ const path = require("path");
 const cheerio = require("cheerio");
 const refreshTokenIfNeeded = require("./refreshTokenIfNeeded");
 
-const storeCurrentlyPlaying = () => {
-  refreshTokenIfNeeded();
+const storeCurrentlyPlaying = async () => {
+  await refreshTokenIfNeeded();
 
   // Read the access token from the file as a string
   const accessTokenFilePath = path.join(__dirname, "../data/access_token.txt");
 
-  // Create the file with a default value if it does not exist
-  if (!fs.existsSync(accessTokenFilePath)) {
-    fs.writeFileSync(accessTokenFilePath, "");
-  }
-
   // Read the access token from the file as a string
-  accessToken = fs.readFileSync(accessTokenFilePath, "utf8");
+  const accessToken = fs.readFileSync(accessTokenFilePath, "utf8");
 
   http.get("http://localhost:8888/nowplaying", (res) => {
     let data = "";

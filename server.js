@@ -3,6 +3,7 @@ const express = require("express");
 const axios = require("axios");
 const querystring = require("querystring");
 const fs = require("fs");
+const path = require("path");
 const app = express();
 const open = require("open");
 
@@ -16,6 +17,9 @@ const generateRandomString = require("./functions/generateRandomString");
 
 const stateKey = "spotify_auth_state";
 let accessToken;
+
+const refreshTokenPath = path.join(__dirname, "./data/refresh_token.txt");
+const tokenExpirationPath = path.join(__dirname, "./data/token_expiration.txt");
 
 // Login endpoint
 app.get("/login", (req, res) => {
@@ -61,13 +65,9 @@ app.get("/callback", (req, res) => {
           response.data;
 
         // Store the expiration time (minus a small buffer to account for delays)
-        const expirationTime = Date.now() + (expires_in - 60) * 1000;
-        fs.writeFileSync(
-          "./data/token_expiration.txt",
-          expirationTime.toString()
-        );
-
-        fs.writeFileSync("./data/refresh_token.txt", refresh_token);
+        const expirationTime = (Date.now() + expires_in * 1000).toString();
+        fs.writeFileSync(tokenExpirationPath, expirationTime);
+        fs.writeFileSync(refreshTokenPath, refresh_token);
 
         axios
           .get("https://api.spotify.com/v1/me", {
@@ -134,24 +134,19 @@ app.get("/callback", (req, res) => {
       }
     })
     .catch((error) => {
-      res.send(error);
+      console.error(error);
     });
 });
 
 // Endpoint to generate a refresh token instead of having to re-login
 app.get("/refresh_token", (req, res) => {
   const { refresh_token } = req.query;
-  const code = req.query.code || null;
-  console.log(code);
-
-  axios({
+  const authOptions = {
     method: "POST",
     url: "https://accounts.spotify.com/api/token",
     data: querystring.stringify({
       grant_type: "refresh_token",
-      code: code,
       refresh_token: refresh_token,
-      redirect_uri: REDIRECT_URI,
     }),
     headers: {
       "content-type": "application/x-www-form-urlencoded",
@@ -159,15 +154,19 @@ app.get("/refresh_token", (req, res) => {
         `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
       ).toString("base64")}`,
     },
-  })
+  };
+  axios(authOptions)
     .then((response) => {
-      res.send(response.data);
-      console.log(response.data);
-      accessToken = refresh_token;
-      fs.writeFileSync("../data/refresh_token.txt", refresh_token);
+      const { access_token, token_type, expires_in } = response.data;
+      res.send({
+        access_token: access_token,
+        token_type: token_type,
+        expires_in: expires_in,
+      });
+      console.log(`Successfully refreshed token.`);
     })
     .catch((error) => {
-      res.send(error);
+      console.error(error);
     });
 });
 
@@ -182,7 +181,7 @@ app.get("/nowplaying", (req, res) => {
       res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
     })
     .catch((error) => {
-      res.send(error);
+      console.error(error);
     });
 });
 
