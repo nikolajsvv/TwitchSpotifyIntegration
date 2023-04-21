@@ -1,51 +1,34 @@
+const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
 
-const refreshTokenIfNeeded = () => {
-  const expirationFilePath = path.join(
+const refreshTokenIfNeeded = async () => {
+  const tokenExpirationPath = path.join(
     __dirname,
     "../data/token_expiration.txt"
   );
+  const refreshTokenPath = path.join(__dirname, "../data/refresh_token.txt");
+  const accessTokenPath = path.join(__dirname, "../data/access_token.txt");
+  const expirationTime = fs.readFileSync(tokenExpirationPath);
+  const refreshToken = fs.readFileSync(refreshTokenPath);
+  if (Date.now().toString() >= expirationTime) {
+    try {
+      const response = await axios.get(
+        `http://localhost:8888/refresh_token?refresh_token=${refreshToken.toString()}`
+      );
 
-  // Create the file with a default value if it does not exist
-  if (!fs.existsSync(expirationFilePath)) {
-    fs.writeFileSync(expirationFilePath, "0");
-  }
+      const newAccessToken = response.data.access_token;
+      const expiresIn = response.data.expires_in;
 
-  const expirationTime = parseInt(fs.readFileSync(expirationFilePath, "utf8"));
-
-  if (Date.now() > expirationTime) {
-    // Read the refresh token from the file as a string
-    const refreshToken = fs.readFileSync("../data/refresh_token.txt", "utf8");
-
-    axios({
-      method: "POST",
-      url: "https://accounts.spotify.com/api/token",
-      data: querystring.stringify({
-        grant_type: "refresh_token",
-        refresh_token: refreshToken,
-      }),
-      headers: {
-        "content-type": "application/x-www-form-urlencoded",
-        Authorization: `Basic ${new Buffer.from(
-          `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
-        ).toString("base64")}`,
-      },
-    }).then((response) => {
-      const { access_token, expires_in } = response.data
-        .then((response) => {
-          const { access_token, expires_in } = response.data;
-          accessToken = access_token;
-
-          // Update the access token and expiration time
-          fs.writeFileSync("../data/access_token.txt", access_token);
-          const expirationTime = Date.now() + (expires_in - 60) * 1000;
-          fs.writeFileSync("../data/token_expiration.txt", expirationTime);
-        })
-        .catch((error) => {
-          console.error("Error refreshing access token:", error);
-        });
-    });
+      fs.writeFileSync(accessTokenPath, newAccessToken.toString());
+      fs.writeFileSync(
+        tokenExpirationPath,
+        (Date.now() + expiresIn * 1000).toString()
+      );
+      console.log(`Successfully updated access_token and expires_in`);
+    } catch (error) {
+      console.error("Failed to refresh access token", error);
+    }
   }
 };
 
