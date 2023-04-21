@@ -20,6 +20,7 @@ let accessToken;
 
 const refreshTokenPath = path.join(__dirname, "./data/refresh_token.txt");
 const tokenExpirationPath = path.join(__dirname, "./data/token_expiration.txt");
+const accessTokenPath = path.join(__dirname, "./data/access_token.txt");
 
 // Login endpoint
 app.get("/login", (req, res) => {
@@ -68,6 +69,7 @@ app.get("/callback", (req, res) => {
         const expirationTime = (Date.now() + expires_in * 1000).toString();
         fs.writeFileSync(tokenExpirationPath, expirationTime);
         fs.writeFileSync(refreshTokenPath, refresh_token);
+        fs.writeFileSync(accessTokenPath, access_token);
 
         axios
           .get("https://api.spotify.com/v1/me", {
@@ -124,7 +126,6 @@ app.get("/callback", (req, res) => {
               </body>
             </html>
             `);
-            accessToken = access_token;
           })
           .catch((error) => {
             res.send(error);
@@ -171,6 +172,8 @@ app.get("/refresh_token", (req, res) => {
 });
 
 app.get("/nowplaying", (req, res) => {
+  const accessToken = fs.readFileSync(accessTokenPath, "utf8");
+  
   axios
     .get("https://api.spotify.com/v1/me/player/currently-playing", {
       headers: {
