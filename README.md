@@ -1,6 +1,6 @@
-# Twitch Chat Spotify Bot
+# Twitch Spotify Integration
 
-A Node.js application that allows users to link their Twitch account with their Spotify account, allowing for their currently playing song on Spotify to be displayed in their Twitch chat.
+A Node.js application that allows Twitch streamers to connect their Spotify accounts, display the currently playing song on their OBS layouts, and access song information through a chatbot in their Twitch chat.
 
 ## Getting Started
 
@@ -17,11 +17,11 @@ You will need to have the following installed on your local machine:
 
 1. Clone the repository to your local machine
 
-   `git clone https://github.com/nikolajsvv/twitch-chat-spotify-bot.git`
+   `git clone https://github.com/nikolajsvv/TwitchSpotifyIntegration.git`
 
 2. Navigate to the directory where the repository was cloned
 
-   `cd twitch-chat-spotify-bot`
+   `cd TwitchSpotifyIntegration`
 
 3. Install the required packages
 
@@ -47,15 +47,7 @@ You will need to have the following installed on your local machine:
   TWITCH_CLIENT_SECRET=your_client_secret
 ```
 
-5. Start the server
-
-   `npm run server`
-
-6. Login to authorize Spotify API by going to
-
-   `localhost:8888/login`
-
-7. Once logged in, start the application
+5. Start the application
 
    `npm start`
 
