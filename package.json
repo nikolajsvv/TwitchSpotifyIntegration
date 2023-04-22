@@ -2,14 +2,14 @@
   "name": "spotify_chat_bot",
   "version": "1.0.0",
   "description": "Twitch chat bot that integrates Spotify API.",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node main.js",
     "server": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "app": "./index.js"
+    "app": "./main.js"
   },
   "repository": {
     "type": "git",
